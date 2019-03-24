@@ -1,0 +1,11 @@
+security:
+  user:
+    password: password  filter-order: 5
+
+debug: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    
