@@ -4,9 +4,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.idursun.java</groupId>
-	<artifactId>spring-and-angular</artifactId>
+	<groupId>com.afkl.exercisesa</groupId>
+	<artifactId>simple-travel-api-maven-mock</artifactId>
 	<version>1.1-SNAPSHOT</version>
+	<name>simple-travel-api-maven-mock</name>
+	<description>Demo project for Spring Boot</description>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>

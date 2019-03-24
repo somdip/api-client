@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="icon" href="favicon.ico">
+<title>K Travels</title>
+<!-- Bootstrap core CSS -->
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<!-- Custom styles -->
+<link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+		<a class="navbar-brand" href="#">KL Travels</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarsExampleDefault"
+			aria-controls="navbarsExampleDefault" aria-expanded="false"
+			aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+	</nav>
+
+	<div role="main" class="container" id="mainBlock">
+
+		<div class="row">
+			<div class="col">
+				<form class="form-signin" v-if="showLogin" method="post">
+					<img class="mb-4" src="" alt="" width="72" height="72">
+					<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+					<label for="inputEmail" class="sr-only">Client Id</label> <input
+						type="text" name="clientId" v-model="clientId" id="clientId"
+						class="form-control" placeholder="Client Id" required autofocus>
+					<label for="inputPassword" class="sr-only">Password</label> <input
+						type="password" v-model="secret" id="secret" name="secret"
+						class="form-control" placeholder="Client Secret" required>
+					<div class="checkbox mb-3">
+						<label> <input type="checkbox" value="remember-me">
+							Remember me
+						</label>
+					</div>
+					<button class="btn btn-lg btn-primary btn-block" type="button"
+						v-on:click="logIn">Sign in</button>
+					<p class="mt-5 mb-3 text-muted">&copy; 2018-2019</p>
+				</form>
+			</div>
+		</div>
+
+		<div class="container" v-if="showJourneyPlanner">
+			<div class="row">
+				<p class="lead">Stat tying the name of your origin and
+					destination , hit the search buttton to get the latest fare and
+					airport updates.</p>
+			</div>
+
+			<div class="row">
+				<div class="col">
+					<input type="text" v-model="destinationFrom" name="destinationFrom"
+						class="form-control" placeholder="Origin" @input="onChangeOrigin"
+						required>
+					<div class="dropdown-menu" v-if="fromLocationsResponse"
+						v-on:click="setFromSearchValue">
+						<a class="dropdown-item"
+							v-for="(location,index) in fromLocationsResponse" href="#nogo"
+							v-bind:code="location.code"
+							v-bind:location="location.description">{{
+							location.description }}</a>
+					</div>
+					<input type="hidden" v-model="fromCode" />
+				</div>
+				<div class="col">
+					<input type="text" v-model="destinationTo" name="destinationTo"
+						class="form-control" placeholder="Destination"
+						@input="onChangeDestination" required>
+					<div class="dropdown-menu" v-if="toLocationsResponse"
+						v-on:click="setToSearchValue">
+						<a class="dropdown-item"
+							v-for="(location,index) in toLocationsResponse" href="#nogo"
+							v-bind:code="location.code"
+							v-bind:location="location.description">{{
+							location.description }}</a>
+					</div>
+					<input type="hidden" v-model="toCode" />
+				</div>
+				<div class="col">
+					<button class="btn btn-primary btn-md btn-block" type="button"
+						v-on:click="search">Search</button>
+				</div>
+			</div>
+
+			<div class="d-flex align-items-center top-buffer"
+				v-if="loadingSpinner">
+				<strong>Loading...</strong>
+				<div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+			</div>
+
+			<div class="row top-buffer" v-if="fare">
+				<div class="col-sm-4">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">Fare</h5>
+							<p class="card-text">{{fare}} {{currency}}</p>
+							<a href="#" class="btn btn-primary">Buy Now</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">Origin Airport</h5>
+							<p class="card-text" v-html="airportInfoSource"></p>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">Destination Airport</h5>
+							<p class="card-text" v-html="airportInfoDestination"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /.container -->
+
+	<script src="js/jquery-3.2.1.slim.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/axios.min.js"></script>
+	<script src="js/vue.js"></script>
+
+	<script>
+	//base API endpoint URL
+	var baseURL = "http://localhost:8080";
+	//authorization header with bearer token
+	var headerBearer = {
+			"Authorization": "Bearer "+localStorage.getItem("token")
+	};
+	
+	//	TODO: force login when token expires
+	//	axios.interceptors.response.use(function (response) {
+	//		return response;
+	//	}, (error) => {
+	//	error.response.code == 401 is not supported unless the CORS Access-allow-origin-request header is present 	
+	//	localStorage.removeItem("token");
+	//	return Promise.reject(error);
+	//});
+	
+	// creating vue object 
+	var airport = new Vue({
+		el: '#mainBlock',
+		data: {
+			clientId: 'travel-api-client',
+			secret: 'psw',
+			showLogin : true,
+			showJourneyPlanner : false,
+			destinationFrom: null,
+			destinationTo: null,
+			fromLocationsResponse: null,
+			toLocationsResponse: null,
+			fromCode: null,
+			toCode: null,
+			fare: null,
+			currency : null,
+			airportInfoSource: null,
+			airportInfoDestination: null,
+			loadingSpinner: null,
+			
+		},
+	methods: {
+		logIn: function (event) {
+			// create the grant_type : client_credentials with FormData 
+			var bodyFormData = new FormData();
+			bodyFormData.set('grant_type', 'client_credentials');
+			
+			// create the basic authentication with clientId and secrect provided by the user
+			var headerBasic = {
+                   "Content-Type": "application/x-www-form-urlencoded",
+                   "Authorization": "Basic "+btoa(this.clientId + ":" + this.secret)
+            };
+			// POST the request to API end point to generate the token and store it in localStorage 
+			axios.post(baseURL + "/oauth/token", bodyFormData, {headers: headerBasic})
+                   .then(function(response){
+						if(response.data.access_token){
+							localStorage.setItem("token",response.data.access_token);
+							// remove the login dialog 
+							airport._data.showLogin=false;
+							//show the booking details
+							airport._data.showJourneyPlanner=true;
+							headerBearer = {
+								"Authorization": "Bearer "+response.data.access_token
+							}
+						}else {
+							console.log("Ünable to get access token from XHR response ");
+						}
+				   }).catch(function(error){
+						console.log("An exception has occured:: "+error);
+				   });
+    },
+	search:function(){
+		let searchURL =baseURL +"/fares/"+this.fromCode+"/"+this.toCode;
+		let airportInfoURL = baseURL+"/airports/";
+			//loading state and XHR spinner
+			airport._data.loadingSpinner = true;
+			airport._data.fare = null;
+			//sending axios parallel request with #axios.all method that returns a promise
+			axios.get(searchURL , {headers: headerBearer})
+                   .then(function(response){
+						axios.all([axios.get(airportInfoURL+response.data.origin,{headers: headerBearer}),axios.get(airportInfoURL+response.data.destination,{headers: headerBearer})]) .then(axios.spread(function (source, destination) {
+							//updating all model binds
+							airport._data.airportInfoSource = this.airportInformation(source);
+							airport._data.airportInfoDestination =  this.airportInformation(destination);
+							airport._data.fare = response.data.amount;
+							airport._data.currency = response.data.currency;
+							airport._data.loadingSpinner = false;
+							
+						}));
+				   }).catch(function(error){
+					   console.log("An exception has occured:: "+error);
+				   });
+	},
+	setFromSearchValue: function(event){
+			let code = event.target.getAttribute("code");
+			let location = event.target.getAttribute("location");
+			airport._data.fromCode = code;
+			airport._data.destinationFrom = location;
+			airport._data.fromLocationsResponse = null;
+	},
+	setToSearchValue: function(event){
+			let code = event.target.getAttribute("code");
+			let location = event.target.getAttribute("location");	
+			airport._data.toCode = code;
+			airport._data.destinationTo = location;		
+			airport._data.toLocationsResponse = null;
+	},
+	onChangeOrigin: function(event){
+		if(this.destinationFrom.length >=3){
+			let autoCompleteURL = baseURL+"/airports?term="+this.destinationFrom+"&size=10";		
+				axios.get(autoCompleteURL , {headers: headerBearer})
+	                   .then(function(response){
+							airport._data.fromLocationsResponse = response.data._embedded.locations;
+					   }).catch(function(error){
+						   console.log("An exception has occured:: "+error);
+					   });
+			}		   
+	},
+	onChangeDestination: function(event){
+		if(this.destinationFrom.length >=3){
+			let autoCompleteURL = baseURL+"/airports?term="+this.destinationTo+"&size=10";
+				axios.get(autoCompleteURL , {headers: headerBearer})
+	                   .then(function(response){
+							airport._data.toLocationsResponse = response.data._embedded.locations;
+					   }).catch(function(error){
+						   console.log("An exception has occured:: "+error);
+					   });
+		}		   
+		}
+	
+  },
+  mounted: function(){
+		if(localStorage.getItem("token") != null){
+			// TODO: implement a token verification mechanism
+			this.showLogin=false;
+			this.showJourneyPlanner=true;
+		}
+  }
+});
+	// Util function to create the airport information cards
+	function airportInformation(response){
+		let information = "Airport name is <b> "+response.data.name+" </b> and code is <b> "+response.data.code+" </b>. This airport is located on latitute  <b> "+response.data.coordinates.latitude+" </b> and longitude <b> "+response.data.coordinates.longitude+" </b> and description <b> "+response.data.description+" </b>." ;
+		return information;
+	}
+</script>
+</body>
+</html>
