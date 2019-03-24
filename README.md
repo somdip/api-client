@@ -15,6 +15,13 @@ The front end client is located under the folder "frontend".
 - Step 6: Once the preffered source and destination is filled in hit the search option to get the mock fare and airport information
 ![image](https://user-images.githubusercontent.com/4983375/54885980-d9e6b000-4e82-11e9-8575-0835683062f5.png)
 
+CORS Filter:
+-------------------
+The following WebSecurityConfiguration and CORS filter has been added to allow CORS origin preflight request:-
+- CorsConfiguration.java
+- CorsFilter.java
+- WebSecurityConfiguration.java
+
 TODO Implementations:
 -------------------
 - currently the clint does not check for token expiry. This has not been implemented as the 401 unauthorized request must have a Access-Control-Allow-Origin header to allow XHR request to fail with a resonse code. Alternatively you can clear the token from the local storage using chrome browser once the authentication fails. It will again promt the login window.
