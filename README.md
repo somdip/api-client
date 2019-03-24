@@ -17,7 +17,7 @@ The front end client is located under the folder "frontend".
 
 CORS Filter:
 -------------------
-The following WebSecurityConfiguration and CORS filter has been added to allow CORS origin preflight request:-
+The following Web Security Configuration and CORS filter has been added under existing package <b>com.afkl.exercises.spring.oauth</b> to allow CORS origin preflight OPTIONS request:-
 - CORSConfiguration.java
 - CORSFilter.java
 - WebSecurityConfiguration.java
