@@ -18,8 +18,8 @@ The front end client is located under the folder "frontend".
 CORS Filter:
 -------------------
 The following WebSecurityConfiguration and CORS filter has been added to allow CORS origin preflight request:-
-- CorsConfiguration.java
-- CorsFilter.java
+- CORSConfiguration.java
+- CORSFilter.java
 - WebSecurityConfiguration.java
 
 TODO Implementations:
