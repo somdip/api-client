@@ -9,7 +9,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @Order(-1)
-public class CorsConfiguration extends WebSecurityConfigurerAdapter {
+public class CORSConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
