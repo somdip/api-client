@@ -22,9 +22,13 @@ The following Web Security Configuration and CORS filter has been added under ex
 - CORSFilter.java
 - WebSecurityConfiguration.java
 
+Client Development:
+-------------------
+Vue Js has been used as the client framework . Axios also has been used to send parallel request while requesting for fare and airport information as seperate XHR call to the REST API.
+
 TODO Implementations:
 -------------------
-- currently the clint does not check for token expiry. This has not been implemented as the 401 unauthorized request must have a Access-Control-Allow-Origin header to allow XHR request to fail with a resonse code. Alternatively you can clear the token from the local storage using chrome browser once the authentication fails. It will again promt the login window.
+- currently the clint does not check for token expiry. This has not been implemented as the 401 unauthorized request must have a Access-Control-Allow-Origin header to allow XHR request to fail with a resonse code. Alternatively you can clear the token from the local storage using chrome browser once the authentication fails for token expiry. It will again promt the login window.
 ![image](https://user-images.githubusercontent.com/4983375/54886049-dacc1180-4e83-11e9-8544-fa5143eb503f.png)
 
 
