@@ -1,5 +1,5 @@
 # api-client
-The front end client is located under the folder <b>"frontend"</b>.
+The front end client is located under the folder <b>"frontend"</b>.I
 
 #Installation
 - Step 1: You can use any HTTP server for running the front end , for example go to Chrome and install the extension 200 OK. https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb
